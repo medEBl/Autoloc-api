@@ -2,6 +2,8 @@ package tn.esprit.autoloc.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import tn.esprit.autoloc.domain.CategorieVehicule;
+import tn.esprit.autoloc.domain.StatutVehicule;
 import tn.esprit.autoloc.domain.Vehicule;
 import tn.esprit.autoloc.repository.VehiculeRepository;
 
@@ -37,5 +39,20 @@ public class VehiculeServiceImpl implements IVehiculeService {
     @Override
     public Optional<Vehicule> findVehiculeById(Long id) {
         return vehiculeRepository.findById(id);
+    }
+
+    @Override
+    public List<Vehicule> findByStatut(StatutVehicule statut) {
+        return vehiculeRepository.findByStatut(statut);
+    }
+
+    @Override
+    public List<Vehicule> findByCategorie(CategorieVehicule categorie) {
+        return vehiculeRepository.findByCategorie(categorie);
+    }
+
+    @Override
+    public List<Vehicule> findByMarque(String marque) {
+        return vehiculeRepository.findByMarque(marque);
     }
 }
