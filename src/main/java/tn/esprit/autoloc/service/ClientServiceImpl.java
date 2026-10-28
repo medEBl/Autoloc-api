@@ -2,9 +2,14 @@ package tn.esprit.autoloc.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import tn.esprit.autoloc.domain.Client;
+import tn.esprit.autoloc.mapper.ClientMapper;
 import tn.esprit.autoloc.repository.ClientRepository;
+import tn.esprit.autoloc.web.dto.ClientRequestDTO;
+import tn.esprit.autoloc.web.dto.ClientResponseDTO;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,15 +18,22 @@ import java.util.Optional;
 public class ClientServiceImpl implements IClientService {
 
     private final ClientRepository clientRepository;
+    private final ClientMapper clientMapper;
 
     @Override
-    public Client addClient(Client client) {
-        return clientRepository.save(client);
+    public ClientResponseDTO addClient(ClientRequestDTO dto) {
+        Client client = clientMapper.toEntity(dto);
+        client.setDateInscription(LocalDate.now());
+        return clientMapper.toDto(clientRepository.save(client));
     }
 
     @Override
-    public Client updateClient(Client client) {
-        return clientRepository.save(client);
+    @Transactional
+    public Optional<ClientResponseDTO> updateClient(Long id, ClientRequestDTO dto) {
+        return clientRepository.findById(id).map(client -> {
+            clientMapper.updateEntity(dto, client);
+            return clientMapper.toDto(clientRepository.save(client));
+        });
     }
 
     @Override
@@ -30,12 +42,12 @@ public class ClientServiceImpl implements IClientService {
     }
 
     @Override
-    public List<Client> findAllClients() {
-        return clientRepository.findAll();
+    public List<ClientResponseDTO> findAllClients() {
+        return clientMapper.toDtoList(clientRepository.findAll());
     }
 
     @Override
-    public Optional<Client> findClientById(Long id) {
-        return clientRepository.findById(id);
+    public Optional<ClientResponseDTO> findClientById(Long id) {
+        return clientRepository.findById(id).map(clientMapper::toDto);
     }
 }

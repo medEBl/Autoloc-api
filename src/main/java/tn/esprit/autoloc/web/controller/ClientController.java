@@ -1,11 +1,13 @@
 package tn.esprit.autoloc.web.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import tn.esprit.autoloc.domain.Client;
 import tn.esprit.autoloc.service.IClientService;
+import tn.esprit.autoloc.web.dto.ClientRequestDTO;
+import tn.esprit.autoloc.web.dto.ClientResponseDTO;
 
 import java.util.List;
 
@@ -17,14 +19,16 @@ public class ClientController {
     private final IClientService clientService;
 
     @PostMapping
-    public ResponseEntity<Client> addClient(@RequestBody Client client) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(clientService.addClient(client));
+    public ResponseEntity<ClientResponseDTO> addClient(@Valid @RequestBody ClientRequestDTO dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(clientService.addClient(dto));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Client> updateClient(@PathVariable Long id, @RequestBody Client client) {
-        client.setIdClient(id);
-        return ResponseEntity.ok(clientService.updateClient(client));
+    public ResponseEntity<ClientResponseDTO> updateClient(@PathVariable Long id,
+                                                          @Valid @RequestBody ClientRequestDTO dto) {
+        return clientService.updateClient(id, dto)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
@@ -34,12 +38,12 @@ public class ClientController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Client>> findAllClients() {
+    public ResponseEntity<List<ClientResponseDTO>> findAllClients() {
         return ResponseEntity.ok(clientService.findAllClients());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Client> findClientById(@PathVariable Long id) {
+    public ResponseEntity<ClientResponseDTO> findClientById(@PathVariable Long id) {
         return clientService.findClientById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
